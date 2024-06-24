@@ -1,0 +1,25 @@
+1)select pid from property where yoc>"2020" and tag = "rent";
+
+ 2)select pid,area,street,pincode from property where price >3000000 and price<5000000;
+
+3)select pid,area,street,pincode from property where street = "VISHAKAPATNAM" and no_of_bedrooms>=2 and price > "15000" and tag = "rent";
+
+
+
+4)SELECT NAME FROM AGENT  ORDER BY total_amount_recieved DESC LIMIT 1;
+       (or)
+select name, max(total) from v4 where total in (select max(total) from v4) group by name;
+  
+ create view v4 as select name, max(total_amount_recieved) as total from agent natural join deal where year(deal_date) > 2015 group by name;
+
+
+6)select * from property where TAG='rent' order by price desc limit 1;
+
+select * from property where TAG='sale' order by price desc limit 1;
+
+
+5)SELECT agent.ID, agent.name, AVG(property.price) 
+AS avg_price_2022, AVG(YEAR(NOW()) - property.yoc) 
+AS avg_years_on_market FROM property JOIN agent ON 
+property.agent_id = agent.id WHERE 
+ property.yoc>2021 GROUP BY agent.id;

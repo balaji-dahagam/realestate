@@ -1,0 +1,60 @@
+CREATE TABLE PROPERTY(
+   PID VARCHAR(10) NOT NULL,
+   AGENT_ID VARCHAR (10) NOT NULL,
+   OWNER_NAME VARCHAR(20) NOT NULL,
+   OWNER_MOBILE BIGINT NOT NULL,
+   NO_OF_BEDROOMS INT NOT NULL,
+   NO_OF_BATHROOMS INT NOT NULL,
+   PRICE INT NOT NULL, 
+   STATUS VARCHAR(8) NOT NULL,
+   TAG  VARCHAR(8)  NOT NULL,
+   LIST_DATE DATE NOT NULL,
+   AREA  VARCHAR (25) NOT NULL ,
+   CITY VARCHAR (20)  NOT NULL,      
+   PRIMARY KEY (PID) 
+);
+
+CREATE TABLE AGENT(
+   ID VARCHAR(8) NOT NULL,
+   NAME VARCHAR(20) NOT NULL,
+   CONTACT BIGINT NOT NULL,
+   PASSWORD VARCHAR(17) NOT NULL,
+   NUM_PROP_SOLD  INT  NOT NULL,
+   NUM_PROP_RENT  INT  NOT NULL,    
+   PRIMARY KEY (ID)
+);
+
+
+
+CREATE TABLE OFFICE(
+   DEAL_NO INT,
+   PID varchar(10) NOT NULL,
+   BUYER_NAME VARCHAR(20) NOT NULL,
+   BUYER_MOBILE BIGINT NOT NULL,
+   DEAL_DATE DATE NOT NULL, 
+   SELLING_PRICE INT NOT NULL,
+   FOREIGN KEY (PID) REFERENCES PROPERTY(PID)
+);
+
+CREATE TABLE ADMIN(
+  USERNAME VARCHAR(20) NOT NULL,
+  PASSWORD VARCHAR(20) NOT NULL,
+  PRIMARY KEY(USERNAME));
+
+
+
+queries.txt
+1) select area,city,pincode,price from property where price<40000 and price>20000 and type ="RENT";
+
+2) select area,city,pincode from property where price<10000 and no_of_bedrooms>1 and tag ="rent" and area ="beach road";
+
+3)select p.agent_id,sum(p.price),a.name from property p,agent a where(EXTRACT(YEAR FROM list_date)="2019" and type = "sale" and status = "closed" and p.agent_id = a.id) group by agent_id;
+
+select p.agent_id,sum(p.price),a.name from property p,agent a  where(EXTRACT(YEAR FROM list_date)="2019" and type = "sale" and status = "closed" and p.agent_id = a.id) group by agent_id limit 1;
+
+4) select p.agent_id,avg(DATEDIFF(s.deal_date,p.list_date) ),avg(p.price) from property p,sales s where(EXTRACT(YEAR FROM list_date)="2019" and  p.pid = s.pid) group by agent_id;
+
+
+5)select p.pid,p.name,p.owner_mobile,p.price,p.area,p.street,p.zip_code,p.type,f.bedroom_num,f.bath_num,f.balcony_num,p.status from property p,features f where type = "rent"  and f.PID = p.PID and status ="closed" having price = (select max(price) from property where type = "rent" and status = "closed");
+
+select p.pid,p.name,p.owner_mobile,p.price,p.area,p.street,p.zip_code,p.type,f.bedroom_num,f.bath_num,f.balcony_num,p.status from property p,features f where type = "rent"  and f.PID = p.PID and status ="open" having price = (select max(price) from property where type = "rent" and status = "open");

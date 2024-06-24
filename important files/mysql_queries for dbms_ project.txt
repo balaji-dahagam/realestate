@@ -1,0 +1,263 @@
+CREATE DATABASE realestate;
+
+use realestate; 
+ drop table OFFICER;
+CREATE TABLE OFFICER(
+USERNAME VARCHAR(20),
+PASSWORD VARCHAR(20),
+AGENT_ID VARCHAR(10),
+ADMIN  INT,
+PRIMARY KEY (USERNAME)
+Foreign Key (AGENT_ID) REFERENCES AGENT(IDZ)
+);
+ drop table AGENT;
+CREATE TABLE AGENT(
+ID VARCHAR(8) NOT NULL,
+NAME VARCHAR(20) NOT NULL,
+MOBILE BIGINT NOT NULL,
+PASSWORD VARCHAR(17) NOT NULL,
+NUM_PROP_SOLD INT NOT NULL,
+NUM_PROP_RENT INT NOT NULL, 
+total_amount_recieved  BIGINT,
+PRIMARY KEY (ID)
+);
+
+
+drop table property;
+CREATE TABLE PROPERTY(
+PID INT NOT NULL,
+AGENT_ID VARCHAR (10) NOT NULL,
+OWNER_NAME VARCHAR(20) NOT 
+NULL,
+OWNER_MOBILE BIGINT NOT NULL,
+NO_OF_BATHROOMS INT,
+NO_OF_BEDROOMS INT,
+PRICE INT NOT NULL, 
+STATUS VARCHAR(8) NOT NULL,
+TYPE VARCHAR(8) NOT NULL,
+TAG VARCHAR(10) NOT NULL,
+LIST_DATE DATE NOT NULL,
+AREA VARCHAR (25) NOT NULL ,
+STREET VARCHAR (20) NOT NULL,
+PINCODE INTEGER NOT NULL, 
+YOC VARCHAR(10),
+PRIMARY KEY (PID),
+Foreign Key (AGENT_ID) REFERENCES AGENT(ID)
+);
+ DROP TABLE OFFICE;
+CREATE TABLE OFFICE(
+DEAL_NO INT,
+PID INT,
+BUYER_NAME VARCHAR(20) NOT 
+NULL,
+BUYER_MOBILE BIGINT NOT NULL,
+AGENT_ID VARCHAR(10) NOT NULL,
+DEAL_DATE DATE NOT NULL, 
+FOREIGN KEY (PID) REFERENCES 
+PROPERTY(PID),
+Foreign Key (AGENT_ID) REFERENCES AGENT(ID)
+);
+
+
+
+CREATE TRIGGER update_agent_properties
+AFTER update ON PROPERTY
+FOR EACH ROW
+BEGIN
+    IF NEW.STATUS = 'CLOSED' THEN
+        UPDATE AGENT
+        SET 
+            NUM_PROP_SOLD = NUM_PROP_SOLD + (CASE WHEN NEW.TAG= 'SALE' THEN 1 ELSE 0 END),
+            NUM_PROP_RENT = NUM_PROP_RENT + (CASE WHEN NEW.TAG = 'RENT' THEN 1 ELSE 0 END),
+            total_amount_recieved = total_amount_recieved + (CASE WHEN NEW.TAG = 'SALE' THEN NEW.PRICE ELSE 0 END)
+        
+        WHERE ID = NEW.AGENT_ID;
+    END IF;
+END;
+
+DROP TRIGGER update_agent_properties;
+
+
+select pid from property where yoc>"2020" and tag = "rent";
+
+ select pid,area,street,pincode from property where price >3000000 and price<5000000;
+
+select pid,area,street,pincode from property where street = "VISHAKAPATNAM" and no_of_bedrooms>=2 and price > "15000" and tag = "rent";
+
+
+SELECT NAME FROM AGENT  ORDER BY total_amount_recieved DESC LIMIT 1;
+
+
+select * from property where TAG='rent' order by price desc limit 1;
+
+select * from property where TAG='sale' order by price desc limit 1;
+
+
+SELECT agent.ID, agent.name, AVG(property.price) 
+AS avg_price_2022, AVG(YEAR(NOW()) - property.yoc) 
+AS avg_years_on_market FROM property JOIN agent ON 
+property.agent_id = agent.id WHERE 
+ property.yoc>2021 GROUP BY agent.id;
+
+create view v2 as select name, max(total_amount_recieved) as total from agent join deal where year(deal_date) > 2020 group by name;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+use project;
+
+CREATE TABLE agent(
+agent_id INT,
+agent_name VARCHAR(100),
+agent_phone VARCHAR(10),
+agent_email VARCHAR(50),
+agent_rating INT,
+PRIMARY KEY(agent_id)
+);
+
+CREATE TABLE buyer(
+buyer_id INT,
+buyer_name VARCHAR(100),
+buyer_budget VARCHAR(100),
+buyer_city VARCHAR(100),
+buyer_phone VARCHAR(10),
+buyer_email VARCHAR(50),
+buyer_agent INT,
+PRIMARY KEY(buyer_id),
+FOREIGN KEY (buyer_agent) REFERENCES agent(agent_id)
+);
+
+CREATE TABLE tenant(
+tenant_id INT,
+tenant_name VARCHAR(100),
+tenant_budget VARCHAR(100),
+tenant_city VARCHAR(100),
+tenant_phone VARCHAR(10),
+tenant_email VARCHAR(50),
+tenant_agent INT,
+PRIMARY KEY(tenant_id),
+FOREIGN KEY (tenant_agent) REFERENCES agent(agent_id)
+);
+
+CREATE TABLE owner(
+owner_id INT,
+owner_name VARCHAR(100),
+owner_phone VARCHAR(10),
+owner_email VARCHAR(50),
+owner_agent INT,
+PRIMARY KEY(owner_id),
+FOREIGN KEY (owner_agent) REFERENCES agent(agent_id)
+);
+
+CREATE TABLE seller(
+seller_id INT,
+seller_name VARCHAR(100),
+seller_phone VARCHAR(10),
+seller_email VARCHAR(50),
+seller_agent INT,
+PRIMARY KEY(seller_id),
+FOREIGN KEY (seller_agent) REFERENCES agent(agent_id)
+);
+
+
+CREATE TABLE pfr(
+property_id INT,
+property_hno VARCHAR(10),
+property_street VARCHAR(50),
+property_city VARCHAR(50),
+property_pincode INT,
+property_area VARCHAR(50),
+property_rent VARCHAR(50),
+property_bhk INT,
+property_year INT,
+property_info VARCHAR(200),
+property_owner INT,
+PRIMARY KEY(property_id),
+FOREIGN KEY(property_owner) REFERENCES owner(owner_id)
+);
+
+CREATE TABLE pfs(
+property_id INT,
+property_hno VARCHAR(10),
+property_street VARCHAR(50),
+property_city VARCHAR(50),
+property_pincode INT,
+property_area VARCHAR(50),
+property_price VARCHAR(50),
+property_bhk INT,
+property_year INT,
+property_info VARCHAR(200),
+property_seller INT,
+PRIMARY KEY(property_id),
+FOREIGN KEY(property_seller) REFERENCES seller(seller_id)
+);
+
+
+CREATE TABLE transaction(
+transaction_id INT,
+transaction_property INT,
+transaction_date DATE,
+transaction_amount VARCHAR(50),
+transaction_gst VARCHAR(50),
+PRIMARY KEY(transaction_id),
+FOREIGN KEY(transaction_property) REFERENCES pfr(property_id),
+FOREIGN KEY(transaction_property) REFERENCES pfs(property_id)
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
